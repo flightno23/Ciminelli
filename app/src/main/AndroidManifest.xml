@@ -9,14 +9,20 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:name=".SplashScreen"
+            android:label="Ciminelli" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" >
         </activity>
 
         <activity android:name=".SecondScreen"
@@ -26,6 +32,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <activity android:name=".AssetInformation"
+            android:label="Ciminelli" >
+
+        </activity>
+
+        <activity android:name=".StageScreen"
+            android:label="Ciminelli" >
+
+        </activity>
+
+
 
 
     </application>

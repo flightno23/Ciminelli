@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TextView
+    <EditText
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="This screen allows you to go up. How cool is that"
-        android:textSize="40dp"/>
+        android:layout_height="wrap_content"
+        android:text="Enter Asset Code"
+        android:layout_marginTop="100dp"
+        android:id="@+id/asset_code"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Asset Information"
+        android:onClick="findAsset"/>
+
 
 </LinearLayout>
