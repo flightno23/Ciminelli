@@ -81,6 +81,10 @@ public class ListViewAdapter extends BaseAdapter {
 
             linear.setBackgroundColor(Color.YELLOW);
 
+        } else if(map.get(FIFTH_COLUMN).equals("2")) {
+
+            linear.setBackgroundColor(Color.GREEN);
+
         }
 
         return convertView;
