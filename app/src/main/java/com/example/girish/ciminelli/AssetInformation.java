@@ -77,26 +77,7 @@ public class AssetInformation extends ActionBarActivity {
 
         t.start();
 
-        /*
-        // On click listener for the stages
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                Intent callStageScreen = new Intent(AssetInformation.this, StageScreen.class);
 
-                HashMap<String, String> tempExtras = list.get(position);
-
-                callStageScreen.putExtra("qr_code", tempExtras.get(FIRST_COLUMN));
-                callStageScreen.putExtra("stage_number", tempExtras.get(SECOND_COLUMN));
-                callStageScreen.putExtra("stage_name", tempExtras.get(THIRD_COLUMN));
-                callStageScreen.putExtra("stage_comments", tempExtras.get(FOURTH_COLUMN));
-                callStageScreen.putExtra("completed", tempExtras.get(FIFTH_COLUMN));
-
-                startActivity(callStageScreen);
-
-            }
-        });
-        */
 
     }
 

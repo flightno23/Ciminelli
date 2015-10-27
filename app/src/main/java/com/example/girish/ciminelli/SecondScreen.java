@@ -117,7 +117,7 @@ public class SecondScreen extends ActionBarActivity{
         SessionDetails.assetCode = assetCode.getText().toString();
 
         if (SessionDetails.assetCode.equals("")) {
-            Toast.makeText(this, "Invaliad QR code. Please try again", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Invalid QR code. Please try again", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -138,13 +138,8 @@ public class SecondScreen extends ActionBarActivity{
                     startActivity(intent);
 
                 } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadingDialog.dismiss();
-                            Toast.makeText(SecondScreen.this, "Invalid QR code. Enter Again", Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    Intent connect = new Intent(SecondScreen.this, ConnectAsset.class);
+                    startActivity(connect);
                 }
 
             }
