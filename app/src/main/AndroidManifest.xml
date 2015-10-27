@@ -3,6 +3,7 @@
     package="com.example.girish.ciminelli" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -34,12 +35,20 @@
         </activity>
 
         <activity android:name=".AssetInformation"
-            android:label="Ciminelli" >
+            android:label="Ciminelli"
+            android:parentActivityName=".SecondScreen" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SecondScreen" />
 
         </activity>
 
         <activity android:name=".StageScreen"
-            android:label="Ciminelli" >
+            android:label="Ciminelli"
+            android:parentActivityName=".AssetInformation" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
 
         </activity>
 

@@ -13,15 +13,11 @@ public class SessionDetails {
 
     static String assetCode = "";
 
-    static String ip = "http://192.168.43.164:8888/";
+    static String ip = "http://192.168.2.20:8888/";
 
     /* setting all permissions to true as default */
 
-    static boolean modifyComments = true;
-
-    static boolean modifyStages = true;
-
-    static boolean qualityGuy = true;
+    static boolean verified = true;
 
     /* Constants to fill the list adapter */
     public static final String FIRST_COLUMN = "First";

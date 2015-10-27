@@ -4,75 +4,83 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_margin="10dp"
     tools:context=".AssetInformation">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/qr_code"
-        android:textSize="10dp"
+        android:textSize="15dp"
         />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/asset_name"
-        android:textSize="10dp"
+        android:textSize="15dp"
         />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/unit_no"
-        android:textSize="10dp"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/area"
-        android:textSize="10dp"/>
+        android:textSize="15dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/location"
-        android:textSize="10dp"/>
+        android:textSize="15dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/service"
-        android:textSize="10dp"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/overall_comments"
-        android:textSize="10dp"
-        />
+        android:textSize="15dp"/>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="10dp">
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        >
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:text="Stage Name"
             android:textStyle="bold"
+            android:textSize="15dp"
             />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:text="Stage Comments"
             android:textStyle="bold"
+            android:textSize="15dp"
             />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="Stage"
+            android:textStyle="bold"
+            android:textSize="15dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="Edit"
+            android:textStyle="bold"
+            android:textSize="15dp"/>
 
     </LinearLayout>
 
@@ -81,8 +89,11 @@
         android:layout_height="match_parent"
         android:id="@+id/listView1"
         android:layout_weight="1"
+        android:focusable="true"
+        android:background="@drawable/border_listview"
         >
     </ListView>
+
 
 
 </LinearLayout>

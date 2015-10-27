@@ -1,10 +1,17 @@
 package com.example.girish.ciminelli;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +27,9 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,6 +59,8 @@ public class MainActivity extends ActionBarActivity {
         editTextUserName = (EditText) findViewById(R.id.editTextUserName);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
 
+
+
     }
 
     /* method runs when the login button is selected */
@@ -56,20 +68,44 @@ public class MainActivity extends ActionBarActivity {
         final String username = editTextUserName.getText().toString();
         final String password = editTextPassword.getText().toString();
 
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                loginCheck(username, password);
-            }
-        });
+        /* check if there is an internet connection available else display to user */
+        if (haveNetworkConnection()) {
+
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    loginCheck(username, password);
+                }
+            });
 
         /* load the progress dialog box and show to the user */
-        loadingDialog = ProgressDialog.show(MainActivity.this, "Please wait", "Loading...");
+            loadingDialog = ProgressDialog.show(MainActivity.this, "Please wait", "Loading...");
 
         /* authenticate the user or else display invalid credentials */
-        t.start();
+            t.start();
+        } else {
+            Toast.makeText(this, "No Internet Connection. Please check device.", Toast.LENGTH_SHORT).show();
+        }
 
 
+
+    }
+
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 
 
@@ -90,7 +126,7 @@ public class MainActivity extends ActionBarActivity {
 
         try{
             HttpClient httpClient = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(SessionDetails.ip + "ciminelli/login.php");
+            HttpPost httpPost = new HttpPost("http://www.drones.cse.buffalo.edu/ciminelli/login/login.php");
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             HttpResponse response = httpClient.execute(httpPost);
@@ -117,6 +153,27 @@ public class MainActivity extends ActionBarActivity {
         }
 
         String s = result.trim();
+        String message = "";
+        try {
+
+            JSONObject json = new JSONObject(s);
+            message = json.getString("success");
+
+            if (message.equalsIgnoreCase("1")) {
+                JSONArray flag = json.getJSONArray("user_details");
+                String verified = flag.getJSONObject(0).getString("verified");
+                if (verified.equalsIgnoreCase("1")) {
+                    SessionDetails.verified = true;
+                } else {
+                    SessionDetails.verified = false;
+                }
+            }
+
+        } catch (JSONException e) {
+
+            e.printStackTrace();
+
+        }
 
         runOnUiThread(new Runnable() {
             @Override
@@ -125,21 +182,22 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        if(s.equalsIgnoreCase("success")){
+        if(message.equalsIgnoreCase("1")){
             Intent intent = new Intent(MainActivity.this, SecondScreen.class);
             SessionDetails.username = username;
             SessionDetails.password = password;
 
             // finish(); // dont finish this activity
             startActivity(intent);
-        }else {
+
+        } else {
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(getApplicationContext(), "Invalid User Name or Password", Toast.LENGTH_LONG).show();
                 }
             });
-
         }
 
     }

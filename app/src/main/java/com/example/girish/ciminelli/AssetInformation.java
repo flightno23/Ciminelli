@@ -1,11 +1,15 @@
 package com.example.girish.ciminelli;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -43,20 +47,22 @@ public class AssetInformation extends ActionBarActivity {
 
     ListView listView;
 
-    TextView qrCode, unitNumber, area, location, service, overallComments, assetName;
+    TextView qrCode, unitNumber, location, service, assetName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.asset_screen);
 
+
+        /* SecondScreen is the parent of AssetInformation class */
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         /*Initializing all the text boxes*/
         qrCode = (TextView) findViewById(R.id.qr_code);
         unitNumber = (TextView) findViewById(R.id.unit_no);
-        area = (TextView) findViewById(R.id.area);
         location = (TextView) findViewById(R.id.location);
         service = (TextView) findViewById(R.id.service);
-        overallComments = (TextView) findViewById(R.id.overall_comments);
         assetName = (TextView) findViewById(R.id.asset_name);
         listView = (ListView) findViewById(R.id.listView1);
 
@@ -71,7 +77,7 @@ public class AssetInformation extends ActionBarActivity {
 
         t.start();
 
-
+        /*
         // On click listener for the stages
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -90,8 +96,70 @@ public class AssetInformation extends ActionBarActivity {
 
             }
         });
+        */
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch(id) {
+            case R.id.action_logout:
+                logout();   // log out method is called when user chooses to log out
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+    /* logout method for the user when he wants to logout of the session */
+    private void logout() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("Are you sure you want to log out?");
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                SessionDetails.password = "";
+                SessionDetails.username = "";
+                SessionDetails.assetCode = "";
+
+                Intent intent = new Intent(AssetInformation.this, MainActivity.class);
+
+                startActivity(intent);
+
+                finish();
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // do nothing
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+
 
     /* method does the GET requests to the server and populated the hashmap for the list view adapter*/
     private void renderView() {
@@ -102,8 +170,11 @@ public class AssetInformation extends ActionBarActivity {
             }
         });
 
-        final String stageDetails = GET(SessionDetails.ip + "android-connect/get_stage_details.php?qr_code="+ SessionDetails.assetCode);
-        final String assetDetails = GET(SessionDetails.ip + "android-connect/get_asset_details.php?qr_code="+ SessionDetails.assetCode);
+        final String stageDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_stage_details.php?qr_code="+ SessionDetails.assetCode);
+        final String assetDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_asset_details.php?qr_code="+ SessionDetails.assetCode);
+
+        Log.d("stages", stageDetails);
+        Log.d("assets", assetDetails);
 
         list = new ArrayList<HashMap<String, String>>();
 
@@ -111,8 +182,6 @@ public class AssetInformation extends ActionBarActivity {
 
         final String unit_no;
         final String asset_name;
-        final String overall_comments;
-        final String area_asset;
         final String location_asset;
         final String service_asset;
 
@@ -143,10 +212,8 @@ public class AssetInformation extends ActionBarActivity {
 
             unit_no = temp.getString("unit_no");
             asset_name = temp.getString("asset_name");
-            overall_comments = temp.getString("overall_comments");
-            area_asset = temp.getString("area");
             location_asset = temp.getString("location");
-            service_asset = temp.getString("service");
+            service_asset = temp.getString("manufacturer");
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -155,10 +222,8 @@ public class AssetInformation extends ActionBarActivity {
                     unitNumber.setText("Unit No: " + unit_no);
                     qrCode.setText("Asset QR Code No: " + SessionDetails.assetCode);
                     assetName.setText("Asset Name: " + asset_name);
-                    overallComments.setText("Overall Comments: " + overall_comments);
-                    area.setText("Area: " + area_asset);
                     location.setText("Location: " + location_asset);
-                    service.setText("Service: " + service_asset);
+                    service.setText("Manufacturer: " + service_asset);
 
                     ListViewAdapter adapter = new ListViewAdapter(AssetInformation.this, AssetInformation.this.list);
                     adapter.notifyDataSetChanged();

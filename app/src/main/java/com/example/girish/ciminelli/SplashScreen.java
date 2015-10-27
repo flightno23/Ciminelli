@@ -8,7 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 /**
  * Created by girish on 9/28/15.
  */
-public class SplashScreen extends ActionBarActivity {
+public class SplashScreen extends Activity {
 
 
     @Override
@@ -21,7 +21,7 @@ public class SplashScreen extends ActionBarActivity {
         Thread timerThread = new Thread(){
             public void run(){
                 try{
-                    sleep(3000);
+                    sleep(2000);
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }finally{

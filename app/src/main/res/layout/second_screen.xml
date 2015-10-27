@@ -6,15 +6,27 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enter Asset Code"
+        android:hint="Enter Asset Code"
         android:layout_marginTop="100dp"
+        android:layout_margin="30dp"
         android:id="@+id/asset_code"/>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:text="Get Asset Information"
-        android:onClick="findAsset"/>
+        android:onClick="findAsset"
+        android:background="@drawable/my_button"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="Scan QR Code"
+        android:onClick="scanQR"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/my_button"
+        android:layout_gravity="center_horizontal" />
 
 
 </LinearLayout>

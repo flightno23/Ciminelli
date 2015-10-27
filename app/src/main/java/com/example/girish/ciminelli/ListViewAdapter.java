@@ -5,11 +5,14 @@ package com.example.girish.ciminelli;
  */
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -33,6 +36,9 @@ public class ListViewAdapter extends BaseAdapter {
     TextView stageName;
     TextView stageComments;
     LinearLayout linear;
+    TextView verified;
+
+    ImageButton clickListView;
 
     public ListViewAdapter(Activity activity, ArrayList<HashMap<String, String>> list) {
 
@@ -58,7 +64,19 @@ public class ListViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public int getViewTypeCount() {
+
+        return getCount();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        return position;
+    }
+
+    @Override
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         LayoutInflater inflater = activity.getLayoutInflater();
 
 
@@ -71,22 +89,55 @@ public class ListViewAdapter extends BaseAdapter {
 
             linear = (LinearLayout) convertView.findViewById(R.id.linear);
 
+            verified = (TextView) convertView.findViewById(R.id.verified);
+
+            clickListView = (ImageButton) convertView.findViewById(R.id.click_button);
+
         }
 
+        clickListView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent callStageScreen = new Intent(parent.getContext(), StageScreen.class);
+
+                HashMap<String, String> tempExtras = list.get(position);
+
+                callStageScreen.putExtra("qr_code", tempExtras.get(FIRST_COLUMN));
+                callStageScreen.putExtra("stage_number", tempExtras.get(SECOND_COLUMN));
+                callStageScreen.putExtra("stage_name", tempExtras.get(THIRD_COLUMN));
+                callStageScreen.putExtra("stage_comments", tempExtras.get(FOURTH_COLUMN));
+                callStageScreen.putExtra("completed", tempExtras.get(FIFTH_COLUMN));
+
+                parent.getContext().startActivity(callStageScreen);
+            }
+        });
+
+
         HashMap<String, String> map=list.get(position);
-        stageName.setText(map.get(THIRD_COLUMN));
-        stageComments.setText(map.get(FOURTH_COLUMN));
+
+        if (map.get(THIRD_COLUMN).equalsIgnoreCase("null")) {
+            stageName.setText("No Stage Information.");
+        } else {
+            stageName.setText(map.get(THIRD_COLUMN));
+            stageComments.setText(map.get(FOURTH_COLUMN));
+        }
+
 
         if (map.get(FIFTH_COLUMN).equals("1")) {
 
-            linear.setBackgroundColor(Color.YELLOW);
+            verified.setBackgroundColor(Color.YELLOW);
 
         } else if(map.get(FIFTH_COLUMN).equals("2")) {
 
-            linear.setBackgroundColor(Color.GREEN);
+            verified.setBackgroundColor(Color.GREEN);
 
         }
 
+
+
         return convertView;
     }
+
+
+
 }
