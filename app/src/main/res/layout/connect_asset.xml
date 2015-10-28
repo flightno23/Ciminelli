@@ -8,7 +8,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner_asset"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/my_button"
         android:layout_margin="50dp"/>
 
     <Spinner
@@ -16,8 +15,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner_unit"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/my_button"
-        android:layout_margin="50dp" />
+        android:layout_margin="50dp"
+        />
 
     <Button
         android:layout_width="match_parent"
@@ -26,7 +25,8 @@
         android:id="@+id/button2"
         android:layout_margin="50dp"
         android:background="@drawable/my_button"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="connectAsset"/>
 
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Ciminelli</string>
+    <string name="app_name">LPC Commissioning</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="app_label">LPCiminelli</string>
 </resources>
