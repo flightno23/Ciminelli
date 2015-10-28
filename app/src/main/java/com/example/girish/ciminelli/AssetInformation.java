@@ -117,8 +117,7 @@ public class AssetInformation extends ActionBarActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                SessionDetails.password = "";
-                SessionDetails.username = "";
+                SaveSharedPreference.clearUserName(AssetInformation.this);
                 SessionDetails.assetCode = "";
 
                 Intent intent = new Intent(AssetInformation.this, MainActivity.class);

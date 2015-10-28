@@ -52,6 +52,14 @@
 
         </activity>
 
+        <activity android:name=".ConnectAsset"
+            android:label="Ciminelli"
+            android:parentActivityName=".SecondScreen" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
 
 
 

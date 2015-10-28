@@ -8,9 +8,6 @@ package com.example.girish.ciminelli;
 public class SessionDetails {
 
 
-    static String username = "";
-    static String password = "";
-
     static String assetCode = "";
 
     static String ip = "http://192.168.2.20:8888/";

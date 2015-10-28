@@ -88,8 +88,7 @@ public class SecondScreen extends ActionBarActivity{
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                SessionDetails.password = "";
-                SessionDetails.username = "";
+                SaveSharedPreference.clearUserName(SecondScreen.this);
                 SessionDetails.assetCode = "";
 
                 Intent intent = new Intent(SecondScreen.this, MainActivity.class);

@@ -62,8 +62,6 @@ public class ConnectAsset extends ActionBarActivity implements AdapterView.OnIte
         String sp1 = String.valueOf(spinnerAsset.getSelectedItem());
 
 
-
-
     }
 
     @Override

@@ -97,8 +97,7 @@ public class StageScreen extends ActionBarActivity{
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                SessionDetails.password = "";
-                SessionDetails.username = "";
+
                 SessionDetails.assetCode = "";
 
 

@@ -53,12 +53,18 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if (SaveSharedPreference.getUserName(MainActivity.this).length() == 0) {
+            setContentView(R.layout.activity_main);
 
-        /* get the username and password from the user */
-        editTextUserName = (EditText) findViewById(R.id.editTextUserName);
-        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
+            /* get the username and password from the user */
+            editTextUserName = (EditText) findViewById(R.id.editTextUserName);
+            editTextPassword = (EditText) findViewById(R.id.editTextPassword);
 
+        } else {
+            Intent intent = new Intent(this, SecondScreen.class);
+            startActivity(intent);
+            finish();
+        }
 
 
     }
@@ -184,11 +190,12 @@ public class MainActivity extends ActionBarActivity {
 
         if(message.equalsIgnoreCase("1")){
             Intent intent = new Intent(MainActivity.this, SecondScreen.class);
-            SessionDetails.username = username;
-            SessionDetails.password = password;
 
-            // finish(); // dont finish this activity
+            SaveSharedPreference.setUserName(MainActivity.this, username);
+
+
             startActivity(intent);
+            finish();
 
         } else {
 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_asset"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/my_button"
+        android:layout_margin="50dp"/>
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_unit"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/my_button"
+        android:layout_margin="50dp" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Connect Asset"
+        android:id="@+id/button2"
+        android:layout_margin="50dp"
+        android:background="@drawable/my_button"
+        android:layout_gravity="center_horizontal" />
+
+
+</LinearLayout>
