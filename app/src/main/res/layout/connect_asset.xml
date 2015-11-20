@@ -3,19 +3,34 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25dp"
+        android:layout_margin="10dp"
+        android:text="Select the Asset Type."/>
+
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/spinner_asset"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="50dp"/>
+        android:layout_margin="30dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25dp"
+        android:layout_margin="10dp"
+        android:text="Select the Unit No."/>
 
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/spinner_unit"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="50dp"
+        android:layout_margin="30dp"
         />
 
     <Button

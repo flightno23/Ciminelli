@@ -141,6 +141,13 @@ public class SecondScreen extends ActionBarActivity{
                     startActivity(connect);
                 }
 
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadingDialog.dismiss();
+                    }
+                });
+
             }
         });
 
@@ -257,7 +264,8 @@ public class SecondScreen extends ActionBarActivity{
                                 @Override
                                 public void run() {
                                     loadingDialog.dismiss();
-                                    Toast.makeText(SecondScreen.this, "Invalid QR code. Enter Again", Toast.LENGTH_LONG).show();
+                                    Intent intent = new Intent(SecondScreen.this, ConnectAsset.class);
+                                    startActivity(intent);
                                 }
                             });
                         }
