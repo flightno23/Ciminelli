@@ -1,5 +1,6 @@
 package com.example.girish.ciminelli;
 
+import android.content.pm.PackageInstaller;
 import android.support.v7.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -165,7 +166,7 @@ public class StageScreen extends ActionBarActivity{
     /* Method that runs when the save comment button is selected */
     public void saveComment(View view) {
 
-        final String qrCode = getIntent().getExtras().getString("qr_code");
+        // final String unitNo = getIntent().getExtras().getString("unit_no");
         final String stageNumber = getIntent().getExtras().getString("stage_number");
         final String comments = viewComment.getText().toString();
 
@@ -179,7 +180,7 @@ public class StageScreen extends ActionBarActivity{
             @Override
             public void run() {
                 List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(3);
-                nameValuePair.add(new BasicNameValuePair("qr_code", qrCode));
+                nameValuePair.add(new BasicNameValuePair("unit_no", SessionDetails.unitNo));
                 nameValuePair.add(new BasicNameValuePair("stage_number", stageNumber));
                 nameValuePair.add(new BasicNameValuePair("stage_comments", comments));
                 makePostRequest("update_stage_comment.php", nameValuePair);
@@ -204,7 +205,7 @@ public class StageScreen extends ActionBarActivity{
             @Override
             public void run() {
                 List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(3);
-                nameValuePair.add(new BasicNameValuePair("qr_code", SessionDetails.assetCode));
+                nameValuePair.add(new BasicNameValuePair("unit_no", SessionDetails.unitNo));
                 nameValuePair.add(new BasicNameValuePair("stage_number", stageNumber));
 
                 if (SessionDetails.verified) {

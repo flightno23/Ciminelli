@@ -185,7 +185,7 @@ String com;
 
                 temp = stages.getJSONObject(i);
                 HashMap<String, String> tempMap = new HashMap<String, String>();
-                tempMap.put(FIRST_COLUMN, temp.getString("qr_code"));
+                tempMap.put(FIRST_COLUMN, temp.getString("unit_no"));
                 tempMap.put(SECOND_COLUMN, temp.getString("stage_number"));
                 tempMap.put(THIRD_COLUMN, temp.getString("stage_name"));
                 com= temp.getString("stage_comments");

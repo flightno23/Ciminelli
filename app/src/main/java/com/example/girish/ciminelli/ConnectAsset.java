@@ -266,6 +266,8 @@ public class ConnectAsset extends ActionBarActivity implements AdapterView.OnIte
             public void run() {
                 makePost();
 
+                SessionDetails.unitNo = spinnerUnit.getSelectedItem().toString();
+
                 Intent intent = new Intent(ConnectAsset.this, AssetInformation.class);
 
                 startActivity(intent);

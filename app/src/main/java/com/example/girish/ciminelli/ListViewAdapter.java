@@ -104,7 +104,7 @@ public class ListViewAdapter extends BaseAdapter {
 
                 HashMap<String, String> tempExtras = list.get(position);
 
-                callStageScreen.putExtra("qr_code", tempExtras.get(FIRST_COLUMN));
+                callStageScreen.putExtra("unit_no", tempExtras.get(FIRST_COLUMN));
                 callStageScreen.putExtra("stage_number", tempExtras.get(SECOND_COLUMN));
                 callStageScreen.putExtra("stage_name", tempExtras.get(THIRD_COLUMN));
                 callStageScreen.putExtra("stage_comments", tempExtras.get(FOURTH_COLUMN));
