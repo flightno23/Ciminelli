@@ -10,6 +10,12 @@ public class SessionDetails {
 
     static String assetCode = "";
 
+    static String unitNo = "";
+
+    static String project_names = "";
+
+    static String comments = "";
+
     static String ip = "http://192.168.2.20:8888/";
 
     /* setting all permissions to true as default */
@@ -22,6 +28,7 @@ public class SessionDetails {
     public static final String THIRD_COLUMN = "Third";
     public static final String FOURTH_COLUMN = "Fourth";
     public static final String FIFTH_COLUMN = "Fifth";
+    public static final String SIXTH_COLUMN ="Sixth";
 
 
 

@@ -1,14 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#7284B4"
     android:orientation="vertical">
+
+
+
+
+    <FrameLayout
+        android:layout_width="225dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="50dp"
+        android:id="@+id/imageView"
+        android:background="#112C85"
+        android:onClick="scanQR"
+        android:layout_gravity="center_horizontal" >
+
+        <ImageButton
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:id="@+id/imageButton"
+            android:background="@drawable/qrcode"
+            android:layout_gravity="center"
+            android:onClick="scanQR" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Scan QR Code"
+            android:textColor="#ffff"
+            android:id="@+id/textView2"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="7dp"
+            android:layout_gravity="left|top" />
+
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="If the code is already set:"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="5dp"
+        android:textColor="#000"
+
+        />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Asset Code"
-        android:layout_marginTop="100dp"
-        android:layout_margin="30dp"
+        android:hint="Enter Equipment ID"
+       android:textSize="20sp"
+        android:background="#ffffff"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
         android:id="@+id/asset_code"/>
 
     <Button
@@ -16,16 +64,12 @@
         android:layout_height="wrap_content"
         android:text="Get Asset Information"
         android:onClick="findAsset"
-        android:background="@drawable/my_button"
-        android:layout_gravity="center_horizontal" />
 
-    <Button
-        android:layout_width="150dp"
+        android:layout_gravity="center_horizontal" />
+    <ImageView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan QR Code"
-        android:onClick="scanQR"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/my_button"
+        android:id="@+id/imageView2"
         android:layout_gravity="center_horizontal" />
 
 

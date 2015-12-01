@@ -1,5 +1,6 @@
 package com.example.girish.ciminelli;
 
+import android.support.v7.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -8,7 +9,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -45,8 +48,15 @@ public class ConnectAsset extends ActionBarActivity implements AdapterView.OnIte
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connect_asset);
+        LinearLayout layout_main=(LinearLayout) findViewById(R.id.action_bar_all);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.custom_actionbar);
+
+        TextView action=(TextView) findViewById(R.id.textView_action);
+        action.setText(SessionDetails.project_names);
 
         spinnerAsset = (Spinner) findViewById(R.id.spinner_asset);
         spinnerUnit = (Spinner) findViewById(R.id.spinner_unit);

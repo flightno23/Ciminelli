@@ -1,5 +1,6 @@
 package com.example.girish.ciminelli;
 
+import android.support.v7.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -16,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
@@ -46,6 +49,12 @@ public class SecondScreen extends ActionBarActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.second_screen);
+        LinearLayout layout_main=(LinearLayout) findViewById(R.id.action_bar_all);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.custom_actionbar);
+
+        TextView action=(TextView) findViewById(R.id.textView_action);
+        action.setText(SessionDetails.project_names);
 
         assetCode = (EditText) findViewById(R.id.asset_code);
 
@@ -113,11 +122,16 @@ public class SecondScreen extends ActionBarActivity{
     /* onClick handler for Getting Asset Information */
     public void findAsset(View view) {
 
-        SessionDetails.assetCode = assetCode.getText().toString();
+        SessionDetails.unitNo = assetCode.getText().toString();
 
-        if (SessionDetails.assetCode.equals("")) {
+        if (SessionDetails.unitNo.equals("")) {
             Toast.makeText(this, "Invalid QR code. Please try again", Toast.LENGTH_SHORT).show();
             return;
+        }
+        else
+        {
+            //Toast.makeText(this,SessionDetails.unitNo, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,SessionDetails.project_names, Toast.LENGTH_SHORT).show();
         }
 
         Thread t = new Thread(new Runnable() {
@@ -130,15 +144,12 @@ public class SecondScreen extends ActionBarActivity{
                   }
                 });
 
-                final String details = GET("http://www.drones.cse.buffalo.edu/ciminelli/qrcode/validateqr.php?qr_code=" +  SessionDetails.assetCode);
+                final String details = GET("http://www.drones.cse.buffalo.edu/ciminelli/qrcode/validateid.php?unit_no="+SessionDetails.unitNo);
 
                 if (details.equals("success")) {
                     Intent intent = new Intent(SecondScreen.this, AssetInformation.class);
                     startActivity(intent);
 
-                } else {
-                    Intent connect = new Intent(SecondScreen.this, ConnectAsset.class);
-                    startActivity(connect);
                 }
 
                 runOnUiThread(new Runnable() {

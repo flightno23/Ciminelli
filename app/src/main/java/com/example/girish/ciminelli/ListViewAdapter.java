@@ -23,6 +23,7 @@ import java.util.HashMap;
 import static com.example.girish.ciminelli.SessionDetails.FIRST_COLUMN;
 import static com.example.girish.ciminelli.SessionDetails.FOURTH_COLUMN;
 import static com.example.girish.ciminelli.SessionDetails.SECOND_COLUMN;
+import static com.example.girish.ciminelli.SessionDetails.SIXTH_COLUMN;
 import static com.example.girish.ciminelli.SessionDetails.THIRD_COLUMN;
 import static com.example.girish.ciminelli.SessionDetails.FIFTH_COLUMN;
 
@@ -37,6 +38,7 @@ public class ListViewAdapter extends BaseAdapter {
     TextView stageComments;
     LinearLayout linear;
     TextView verified;
+    TextView fullcomments;
 
     ImageButton clickListView;
 
@@ -107,6 +109,7 @@ public class ListViewAdapter extends BaseAdapter {
                 callStageScreen.putExtra("stage_name", tempExtras.get(THIRD_COLUMN));
                 callStageScreen.putExtra("stage_comments", tempExtras.get(FOURTH_COLUMN));
                 callStageScreen.putExtra("completed", tempExtras.get(FIFTH_COLUMN));
+                callStageScreen.putExtra("actual_comments",tempExtras.get(SIXTH_COLUMN));
 
                 parent.getContext().startActivity(callStageScreen);
             }

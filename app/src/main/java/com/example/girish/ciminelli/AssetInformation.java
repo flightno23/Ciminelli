@@ -1,5 +1,6 @@
 package com.example.girish.ciminelli;
 
+import android.support.v7.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -33,6 +35,7 @@ import java.util.HashMap;
 import static com.example.girish.ciminelli.SessionDetails.FIRST_COLUMN;
 import static com.example.girish.ciminelli.SessionDetails.FOURTH_COLUMN;
 import static com.example.girish.ciminelli.SessionDetails.SECOND_COLUMN;
+import static com.example.girish.ciminelli.SessionDetails.SIXTH_COLUMN;
 import static com.example.girish.ciminelli.SessionDetails.THIRD_COLUMN;
 import static com.example.girish.ciminelli.SessionDetails.FIFTH_COLUMN;
 
@@ -46,23 +49,28 @@ public class AssetInformation extends ActionBarActivity {
     private ArrayList<HashMap<String, String>> list;
 
     ListView listView;
-
+String com;
     TextView qrCode, unitNumber, location, service, assetName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.asset_screen);
+        LinearLayout layout_main=(LinearLayout) findViewById(R.id.action_bar_all);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.custom_actionbar);
 
+        TextView action=(TextView) findViewById(R.id.textView_action);
+        action.setText(SessionDetails.project_names);
 
         /* SecondScreen is the parent of AssetInformation class */
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         /*Initializing all the text boxes*/
-        qrCode = (TextView) findViewById(R.id.qr_code);
+       // qrCode = (TextView) findViewById(R.id.qr_code);
         unitNumber = (TextView) findViewById(R.id.unit_no);
         location = (TextView) findViewById(R.id.location);
-        service = (TextView) findViewById(R.id.service);
+       // service = (TextView) findViewById(R.id.service);
         assetName = (TextView) findViewById(R.id.asset_name);
         listView = (ListView) findViewById(R.id.listView1);
 
@@ -150,8 +158,8 @@ public class AssetInformation extends ActionBarActivity {
             }
         });
 
-        final String stageDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_stage_details.php?qr_code="+ SessionDetails.assetCode);
-        final String assetDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_asset_details.php?qr_code="+ SessionDetails.assetCode);
+        final String stageDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_stage_details.php?unit_no="+SessionDetails.unitNo+"&"+"project_name="+SessionDetails.project_names);
+        final String assetDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_asset_details.php?unit_no="+SessionDetails.unitNo+"&"+"project_name="+SessionDetails.project_names);
 
         Log.d("stages", stageDetails);
         Log.d("assets", assetDetails);
@@ -180,7 +188,21 @@ public class AssetInformation extends ActionBarActivity {
                 tempMap.put(FIRST_COLUMN, temp.getString("qr_code"));
                 tempMap.put(SECOND_COLUMN, temp.getString("stage_number"));
                 tempMap.put(THIRD_COLUMN, temp.getString("stage_name"));
-                tempMap.put(FOURTH_COLUMN, temp.getString("stage_comments"));
+                com= temp.getString("stage_comments");
+                if (com.length()<30)
+                {
+
+                    tempMap.put(FOURTH_COLUMN, temp.getString("stage_comments"));
+                    tempMap.put(SIXTH_COLUMN,temp.getString("stage_comments"));
+
+                }
+                else
+                {   com=com.substring(0,30)+"...";
+                    tempMap.put(FOURTH_COLUMN, com);
+                    tempMap.put(SIXTH_COLUMN,temp.getString("stage_comments"));
+
+                }
+
                 tempMap.put(FIFTH_COLUMN, temp.getString("completed"));
                 list.add(tempMap);
 
@@ -193,17 +215,17 @@ public class AssetInformation extends ActionBarActivity {
             unit_no = temp.getString("unit_no");
             asset_name = temp.getString("asset_name");
             location_asset = temp.getString("location");
-            service_asset = temp.getString("manufacturer");
+           // service_asset = temp.getString("manufacturer");
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
 
-                    unitNumber.setText("Unit No: " + unit_no);
-                    qrCode.setText("Asset QR Code No: " + SessionDetails.assetCode);
-                    assetName.setText("Asset Name: " + asset_name);
-                    location.setText("Location: " + location_asset);
-                    service.setText("Manufacturer: " + service_asset);
+                    unitNumber.setText( unit_no);
+                    //qrCode.setText("Asset QR Code No: " + SessionDetails.assetCode);
+                    assetName.setText( asset_name);
+                    location.setText( location_asset);
+                    //service.setText("Manufacturer: " + service_asset);
 
                     ListViewAdapter adapter = new ListViewAdapter(AssetInformation.this, AssetInformation.this.list);
                     adapter.notifyDataSetChanged();

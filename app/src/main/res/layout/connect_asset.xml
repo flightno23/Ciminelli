@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
+    android:background="#7284B4"
     android:layout_height="match_parent">
 
 
@@ -8,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="25dp"
+        android:textColor="#000"
         android:layout_margin="10dp"
         android:text="Select the Asset Type."/>
 
@@ -15,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/spinner_asset"
+        android:textColor="#000"
         android:layout_gravity="center_horizontal"
         android:layout_margin="30dp"/>
 
@@ -22,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="25dp"
+        android:textColor="#000"
         android:layout_margin="10dp"
         android:text="Select the Unit No."/>
 
@@ -29,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/spinner_unit"
+        android:textColor="#000"
         android:layout_gravity="center_horizontal"
         android:layout_margin="30dp"
         />
@@ -39,7 +44,7 @@
         android:text="Connect Asset"
         android:id="@+id/button2"
         android:layout_margin="50dp"
-        android:background="@drawable/my_button"
+ android:textColor="#7284B4"
         android:layout_gravity="center_horizontal"
         android:onClick="connectAsset"/>
 

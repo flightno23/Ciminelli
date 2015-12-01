@@ -3,41 +3,123 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#7284B4"
     android:orientation="vertical"
-    android:layout_margin="10dp"
+
     tools:context=".AssetInformation">
 
-    <TextView
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/qr_code"
-        android:textSize="15dp"
+        android:orientation="horizontal"
+
+        android:paddingRight="40dp"
+        android:paddingLeft="20dp"
+
+
+        >
+
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/assetname"
+        android:hint="Equipment Type:"
+        android:textColorHint="#000"
+        android:background="#7284B4"
+        android:layout_weight="2"
+        android:layout_marginTop="30dp"
+        android:textSize="20dp"
+
         />
-
-    <TextView
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/asset_name"
+            android:background="#fff"
+            android:layout_marginTop="30dp"
+            android:textSize="15dp"
+            android:textColor="#000"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="3"
+            />
+</LinearLayout>
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/asset_name"
-        android:textSize="15dp"
-        />
+        android:orientation="horizontal"
 
-    <TextView
+        android:paddingRight="40dp"
+        android:paddingLeft="20dp"
+
+
+        >
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/unitno"
+            android:hint="Equipment ID:"
+            android:textColorHint="#000"
+            android:background="#7284B4"
+            android:layout_weight="2"
+            android:layout_marginTop="30dp"
+            android:textSize="20dp"
+
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/unit_no"
+            android:background="#fff"
+            android:layout_marginTop="30dp"
+            android:textSize="15dp"
+            android:textColor="#000"
+            android:layout_marginLeft="45dp"
+            android:layout_weight="3"
+            />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/unit_no"
-        android:textSize="15dp"/>
+        android:orientation="horizontal"
+         android:paddingRight="40dp"
+        android:paddingLeft="20dp"
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/location"
-        android:textSize="15dp"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/service"
-        android:textSize="15dp"/>
+        >
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/ocation"
+            android:hint="Location:"
+            android:textColorHint="#000"
+            android:background="#7284B4"
+            android:layout_weight="2"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="30dp"
+            android:textSize="20dp"
+
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/location"
+            android:background="#fff"
+            android:textColor="#000"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="85dp"
+            android:textSize="15dp"
+            android:layout_weight="3"
+            />
+    </LinearLayout>
+
 
 
     <LinearLayout
@@ -45,6 +127,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingLeft="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="#ffff"
         android:paddingRight="10dp"
         >
 
@@ -53,6 +138,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="Stage Name"
+            android:textColor="#000"
             android:textStyle="bold"
             android:textSize="15dp"
             />
@@ -61,7 +147,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:text="Stage Comments"
+            android:textColor="#000"
+            android:text="Comments"
             android:textStyle="bold"
             android:textSize="15dp"
             />
@@ -70,7 +157,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.8"
-            android:text="Stage"
+            android:text=""
             android:textStyle="bold"
             android:textSize="15dp"/>
 
@@ -79,6 +166,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.8"
             android:text="Edit"
+
+            android:textColor="#000"
             android:textStyle="bold"
             android:textSize="15dp"/>
 
@@ -87,6 +176,9 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
         android:id="@+id/listView1"
         android:layout_weight="1"
         android:focusable="true"

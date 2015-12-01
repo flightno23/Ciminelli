@@ -1,5 +1,6 @@
 package com.example.girish.ciminelli;
 
+import android.support.v7.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,10 +45,19 @@ public class StageScreen extends ActionBarActivity{
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        LinearLayout layout_main=(LinearLayout) findViewById(R.id.action_bar_all);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.custom_actionbar);
 
+        TextView action=(TextView) findViewById(R.id.textView_action);
+        action.setText(SessionDetails.project_names);
         setContentView(R.layout.stage_screen);
+        Intent i= getIntent();
+        String comments = i.getStringExtra("actual_comments");
+
 
         viewComment = (EditText) findViewById(R.id.view_comment);
+        viewComment.setText(comments);
 
         stageButton = (Button) findViewById(R.id.stage_button);
 

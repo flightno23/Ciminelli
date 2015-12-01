@@ -3,14 +3,14 @@
     package="com.example.girish.ciminelli" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:logo="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
         <activity
             android:name=".SplashScreen"
             android:label="@string/app_name" >
@@ -20,49 +20,44 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_label" >
         </activity>
-
-        <activity android:name=".SecondScreen"
+        <activity
+            android:name=".SecondScreen"
             android:label="@string/app_label"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-        <activity android:name=".AssetInformation"
+        <activity
+            android:name=".AssetInformation"
             android:label="@string/app_label"
             android:parentActivityName=".SecondScreen" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".SecondScreen" />
-
         </activity>
-
-        <activity android:name=".StageScreen"
+        <activity
+            android:name=".StageScreen"
             android:label="@string/app_label"
             android:parentActivityName=".AssetInformation" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-
         </activity>
-
-        <activity android:name=".ConnectAsset"
+        <activity
+            android:name=".ConnectAsset"
             android:label="@string/app_label"
             android:parentActivityName=".SecondScreen" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-
-
-
+        <activity android:name=".Testing" >
+        </activity>
     </application>
 
 </manifest>

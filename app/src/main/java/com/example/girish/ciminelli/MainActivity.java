@@ -1,6 +1,6 @@
 package com.example.girish.ciminelli;
 
-import android.app.ActionBar;
+import android.support.v7.app.ActionBar;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
@@ -50,18 +51,27 @@ public class MainActivity extends ActionBarActivity {
     private Dialog loadingDialog;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        LinearLayout layout_main=(LinearLayout) findViewById(R.id.action_bar_main);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.action_bar);
+
+
         if (SaveSharedPreference.getUserName(MainActivity.this).length() == 0) {
             setContentView(R.layout.activity_main);
+
+
 
             /* get the username and password from the user */
             editTextUserName = (EditText) findViewById(R.id.editTextUserName);
             editTextPassword = (EditText) findViewById(R.id.editTextPassword);
 
         } else {
-            Intent intent = new Intent(this, SecondScreen.class);
+            Intent intent = new Intent(this, Testing.class);
             startActivity(intent);
             finish();
         }
@@ -189,7 +199,7 @@ public class MainActivity extends ActionBarActivity {
         });
 
         if(message.equalsIgnoreCase("1")){
-            Intent intent = new Intent(MainActivity.this, SecondScreen.class);
+            Intent intent = new Intent(MainActivity.this, Testing.class);
 
             SaveSharedPreference.setUserName(MainActivity.this, username);
 
