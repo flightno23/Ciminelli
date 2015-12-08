@@ -239,6 +239,13 @@ String com;
         } catch (JSONException e) {
 
             e.printStackTrace();
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadingDialog.dismiss();
+                }
+            });
         }
 
         // --------------------

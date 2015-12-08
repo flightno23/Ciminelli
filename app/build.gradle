@@ -8,7 +8,7 @@ android {
         applicationId "com.buffalo.girishsuri.ciminelli"
         minSdkVersion 14
         targetSdkVersion 14
-        versionCode 6
+        versionCode 7
         versionName "2.0"
     }
     buildTypes {

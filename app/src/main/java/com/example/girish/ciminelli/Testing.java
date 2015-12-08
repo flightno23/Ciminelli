@@ -121,7 +121,13 @@ ListView listView;
                 temp=projectname.getJSONObject(i);
                 String project = (String) temp.getString("projectName");
                 list.add(project);
-                adapter.notifyDataSetChanged();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.notifyDataSetChanged();
+                    }
+                });
                 //list.add(unitNo);
 
                // SessionDetails.project_name=unitNo;
@@ -133,14 +139,6 @@ ListView listView;
                 @Override
                 public void run() {
 
-
-                    //ArrayAdapter<String> data =
-                      //      new ArrayAdapter<String>(Testing.this, android.R.layout.simple_list_item_1, list);
-
-                    //data.setDropDownViewResource(android.R.layout.simple_list_item_1);
-                    // data.notifyDataSetChanged();
-                    //listView.setAdapter(data);
-                    //SessionDetails.project_name= listView.getSelectedItem().toString();
 
                     loadingDialog.dismiss();
 

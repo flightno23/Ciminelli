@@ -21,12 +21,30 @@ public class SplashScreen extends Activity {
         Thread timerThread = new Thread(){
             public void run(){
                 try{
+
                     sleep(2000);
+
                 }catch(InterruptedException e){
+
                     e.printStackTrace();
+
                 }finally{
-                    Intent intent = new Intent(SplashScreen.this,MainActivity.class);
-                    startActivity(intent);
+
+                    if (SaveSharedPreference.getUserName(getApplicationContext()).length() == 0
+                            || (!Utility.haveNetworkConnection(getApplicationContext())) ) {
+
+                        Intent intent = new Intent(SplashScreen.this,MainActivity.class);
+                        startActivity(intent);
+                        finish();
+
+                    } else {
+
+                        Intent intent = new Intent(SplashScreen.this,Testing.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+
                 }
             }
         };

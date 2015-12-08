@@ -60,21 +60,11 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar);
 
+        setContentView(R.layout.activity_main);
 
-        if (SaveSharedPreference.getUserName(MainActivity.this).length() == 0) {
-            setContentView(R.layout.activity_main);
-
-
-
-            /* get the username and password from the user */
-            editTextUserName = (EditText) findViewById(R.id.editTextUserName);
-            editTextPassword = (EditText) findViewById(R.id.editTextPassword);
-
-        } else {
-            Intent intent = new Intent(this, Testing.class);
-            startActivity(intent);
-            finish();
-        }
+        /* get the username and password from the user */
+        editTextUserName = (EditText) findViewById(R.id.editTextUserName);
+        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
 
 
     }
@@ -85,7 +75,7 @@ public class MainActivity extends ActionBarActivity {
         final String password = editTextPassword.getText().toString();
 
         /* check if there is an internet connection available else display to user */
-        if (haveNetworkConnection()) {
+        if (Utility.haveNetworkConnection(getApplicationContext())) {
 
             Thread t = new Thread(new Runnable() {
                 @Override
@@ -107,22 +97,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    private boolean haveNetworkConnection() {
-        boolean haveConnectedWifi = false;
-        boolean haveConnectedMobile = false;
 
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
-        for (NetworkInfo ni : netInfo) {
-            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
-                if (ni.isConnected())
-                    haveConnectedWifi = true;
-            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
-                if (ni.isConnected())
-                    haveConnectedMobile = true;
-        }
-        return haveConnectedWifi || haveConnectedMobile;
-    }
 
 
 
@@ -201,7 +176,7 @@ public class MainActivity extends ActionBarActivity {
         if(message.equalsIgnoreCase("1")){
             Intent intent = new Intent(MainActivity.this, Testing.class);
 
-            SaveSharedPreference.setUserName(MainActivity.this, username);
+            SaveSharedPreference.setUserName(getApplicationContext(), username);
 
 
             startActivity(intent);
