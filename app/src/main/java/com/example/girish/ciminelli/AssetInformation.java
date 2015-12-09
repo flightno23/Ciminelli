@@ -49,7 +49,7 @@ public class AssetInformation extends ActionBarActivity {
     private ArrayList<HashMap<String, String>> list;
 
     ListView listView;
-String com;
+    String com;
     TextView qrCode, unitNumber, location, service, assetName;
 
     @Override

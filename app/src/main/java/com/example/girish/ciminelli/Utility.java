@@ -25,4 +25,6 @@ public class Utility {
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+
+
 }

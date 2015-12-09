@@ -1,44 +1,32 @@
 package com.example.girish.ciminelli;
 
 import android.support.v7.app.ActionBar;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
+
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -46,11 +34,9 @@ public class MainActivity extends ActionBarActivity {
     private EditText editTextUserName;
     private EditText editTextPassword;
 
-    public static final String USER_NAME = "USERNAME";
+    private Button loginButton;
 
-    private Dialog loadingDialog;
-
-
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,132 +52,120 @@ public class MainActivity extends ActionBarActivity {
         editTextUserName = (EditText) findViewById(R.id.editTextUserName);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
 
+        loginButton = (Button) findViewById(R.id.button);
 
-    }
-
-    /* method runs when the login button is selected */
-    public void invokeLogin(View view){
-        final String username = editTextUserName.getText().toString();
-        final String password = editTextPassword.getText().toString();
-
-        /* check if there is an internet connection available else display to user */
-        if (Utility.haveNetworkConnection(getApplicationContext())) {
-
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    loginCheck(username, password);
-                }
-            });
-
-        /* load the progress dialog box and show to the user */
-            loadingDialog = ProgressDialog.show(MainActivity.this, "Please wait", "Loading...");
-
-        /* authenticate the user or else display invalid credentials */
-            t.start();
-        } else {
-            Toast.makeText(this, "No Internet Connection. Please check device.", Toast.LENGTH_SHORT).show();
-        }
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Please wait...");
+        pDialog.setCancelable(false);
 
 
 
-    }
-
-
-
-
-
-    /* method that makes the post request to the server and checks the password
-    * Runs from a worker thread and updates the UI as appropriate */
-    private void loginCheck(String username, String password) {
-
-
-
-        InputStream is = null;
-
-        // username and password key value pairs for authentication
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-        nameValuePairs.add(new BasicNameValuePair("username", username));
-        nameValuePairs.add(new BasicNameValuePair("password", password));
-        String result = null;
-
-        try{
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost("http://www.drones.cse.buffalo.edu/ciminelli/login/login.php");
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            HttpResponse response = httpClient.execute(httpPost);
-
-            HttpEntity entity = response.getEntity();
-
-            is = entity.getContent();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"), 8);
-            StringBuilder sb = new StringBuilder();
-
-            String line = null;
-            while ((line = reader.readLine()) != null)
-            {
-                sb.append(line + "\n");
-            }
-            result = sb.toString();
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String s = result.trim();
-        String message = "";
-        try {
-
-            JSONObject json = new JSONObject(s);
-            message = json.getString("success");
-
-            if (message.equalsIgnoreCase("1")) {
-                JSONArray flag = json.getJSONArray("user_details");
-                String verified = flag.getJSONObject(0).getString("verified");
-                if (verified.equalsIgnoreCase("1")) {
-                    SessionDetails.verified = true;
-                } else {
-                    SessionDetails.verified = false;
-                }
-            }
-
-        } catch (JSONException e) {
-
-            e.printStackTrace();
-
-        }
-
-        runOnUiThread(new Runnable() {
+        /* On click listener for the login button */
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                loadingDialog.dismiss();
+            public void onClick(View v) {
+                login();
             }
         });
 
-        if(message.equalsIgnoreCase("1")){
-            Intent intent = new Intent(MainActivity.this, Testing.class);
 
-            SaveSharedPreference.setUserName(getApplicationContext(), username);
+    }
+
+    /*
+     * Authenticates the user with the remote Web Server using Volley for fast
+     * and error-free networking
+     */
+    private void login() {
+        showpDialog();
+
+        Log.d("Volley:", "in login method");
+
+        final String username = editTextUserName.getText().toString();
+        final String password = editTextPassword.getText().toString();
+
+        StringRequest sr = new StringRequest(Request.Method.POST, "http://www.drones.cse.buffalo.edu/ciminelli/login/login.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {   /* Successfull response listener */
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            String message = json.getString("success");
+
+                            /* Authenticate user - success = 1 implies successfull authentication with remote server */
+                            if (message.equalsIgnoreCase("1")) {
+                                JSONArray flag = json.getJSONArray("user_details");
+                                String verified = flag.getJSONObject(0).getString("verified");
+
+                                if (verified.equalsIgnoreCase("1")) {
+                                    SessionDetails.verified = true;
+                                } else {
+                                    SessionDetails.verified = false;
+                                }
+
+                                SaveSharedPreference.setUserName(getApplicationContext(), username);
+                                Log.d("Volley:", username);
+                                Log.d("Verified", String.valueOf(SessionDetails.verified));
+
+                                Intent intent = new Intent(MainActivity.this, Testing.class);
+
+                                startActivity(intent);
 
 
-            startActivity(intent);
-            finish();
+                            } else {
+                                Toast.makeText(MainActivity.this, "Invalid Username or Password..", Toast.LENGTH_SHORT).show();
 
-        } else {
+                            }
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), "Invalid User Name or Password", Toast.LENGTH_LONG).show();
-                }
-            });
-        }
+                        } catch (JSONException e) {
+                            Toast.makeText(MainActivity.this, "Some Error with parsing. Try again", Toast.LENGTH_SHORT).show();
+                        }
 
+                        hidepDialog();
+
+                    }
+                }, new Response.ErrorListener() {   /* Error Listener (Bad network connection, etc) */
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        hidepDialog();
+                        Toast.makeText(MainActivity.this, "Some Problem with network....", Toast.LENGTH_LONG).show();
+
+                        Log.d("Volley:", error.toString());
+                    }
+        }) {
+            /* POST parameters added to this http request */
+            @Override
+            protected Map<String, String> getParams() {
+
+                Map<String, String> params = new HashMap<String, String>();
+
+                /* Pass in the POST parameters */
+                params.put("username", username);
+                params.put("password", password);
+
+                return params;
+
+            }
+        };
+
+        /* Add this request to the volley queue */
+        AppController.getInstance().addToRequestQueue(sr);
+    }
+
+
+    /*
+     * Method that will render the progress Dialog in the UI
+     */
+    private void showpDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    /*
+     * Method to hide the progress Dialog from the UI
+     */
+    private void hidepDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
     }
 
 

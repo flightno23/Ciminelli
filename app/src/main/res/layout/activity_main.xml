@@ -47,10 +47,8 @@
         android:textAllCaps="false"
 
         android:textColor="#7284B4"
-        android:onClick="invokeLogin"
         android:layout_marginLeft="20dp"
         android:id="@+id/button" />
-
 
 
 </LinearLayout>
