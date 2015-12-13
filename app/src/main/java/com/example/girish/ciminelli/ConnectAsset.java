@@ -1,5 +1,6 @@
 package com.example.girish.ciminelli;
 
+import android.app.ProgressDialog;
 import android.support.v7.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -32,7 +39,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by girish on 10/27/15.
@@ -45,6 +54,8 @@ public class ConnectAsset extends ActionBarActivity implements AdapterView.OnIte
     ArrayList<String> assetList;
 
     ArrayList<String> unitList;
+
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,23 +72,18 @@ public class ConnectAsset extends ActionBarActivity implements AdapterView.OnIte
         spinnerAsset = (Spinner) findViewById(R.id.spinner_asset);
         spinnerUnit = (Spinner) findViewById(R.id.spinner_unit);
 
+        /* Progress Dialog config */
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Please wait...");
+        pDialog.setCancelable(false);
 
 
+        /* Declare array list that hold the distinct elements of each spinner */
         assetList = new ArrayList<String>();
         unitList = new ArrayList<String>();
-        // make a request to populate spinner 1
 
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                populateAssetSpinner();
-            }
-        });
-
-        t.start();
-
-
-
+        // make a request to populate Asset Spinner
+        populateAssetSpinner();
 
 
     }
@@ -90,6 +96,10 @@ public class ConnectAsset extends ActionBarActivity implements AdapterView.OnIte
 
         Log.d("item:", sp1);
 
+        populateUnitSpinner(sp1);
+
+
+        /*
         Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -98,7 +108,7 @@ public class ConnectAsset extends ActionBarActivity implements AdapterView.OnIte
         });
 
         t2.start();
-
+        */
 
     }
 
@@ -108,174 +118,164 @@ public class ConnectAsset extends ActionBarActivity implements AdapterView.OnIte
     }
 
     public void populateUnitSpinner(String itemSelected) {
-        itemSelected = itemSelected.replaceAll(" ", "+");
-        String result = GET("http://www.drones.cse.buffalo.edu/ciminelli/connectasset/unitname.php?asset_name=" + itemSelected);
 
-        Log.d("result::", result);
+        showpDialog();
+
+        itemSelected = itemSelected.replaceAll(" ", "+");
+        String unitUrl = "http://www.drones.cse.buffalo.edu/ciminelli/connectasset/unitname.php?asset_name=" + itemSelected;
+
         unitList = new ArrayList<String>();
 
-        try {
+        StringRequest sr = new StringRequest(Request.Method.GET, unitUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            JSONArray units = json.getJSONArray("units");
 
-            JSONObject json = new JSONObject(result);
-            JSONArray units = json.getJSONArray("units");
-            JSONObject temp = null;
 
-            for (int i = 0; i < units.length(); i++) {
-                String unitNo = (String) units.get(i);
+                            for (int i = 0; i < units.length(); i++) {
+                                String unitNo = (String) units.get(i);
 
-                unitList.add(unitNo);
-            }
+                                unitList.add(unitNo);
+                            }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                            ArrayAdapter<String> data =
+                                    new ArrayAdapter<String>(ConnectAsset.this, android.R.layout.simple_spinner_dropdown_item, unitList);
 
-        runOnUiThread(new Runnable() {
+                            data.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            data.notifyDataSetChanged();
+                            spinnerUnit.setAdapter(data);
+
+                        } catch(JSONException e) {
+                            // fill in the error handling code later
+                        }
+                        hidepDialog();
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void run() {
-
-                ArrayAdapter<String> data =
-                        new ArrayAdapter<String>(ConnectAsset.this, android.R.layout.simple_spinner_dropdown_item, unitList);
-
-                data.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                data.notifyDataSetChanged();
-                spinnerUnit.setAdapter(data);
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ConnectAsset.this, "Some network Issue. Please try again", Toast.LENGTH_SHORT).show();
+                hidepDialog();
             }
         });
+
+        AppController.getInstance().addToRequestQueue(sr);
+
+
 
     }
 
 
     /* method to populate the asset spinner */
     public void populateAssetSpinner() {
-        String result = GET("http://www.drones.cse.buffalo.edu/ciminelli/connectasset/assetname.php");
 
-        try {
-            JSONObject json = new JSONObject(result);
-            JSONArray stages = json.getJSONArray("assets");
-            JSONObject temp = null;
+        showpDialog();
 
-            for (int i = 0; i < stages.length(); i++) {
-                String assetName = (String) stages.get(i);
+        String spinnerUrl = "http://www.drones.cse.buffalo.edu/ciminelli/connectasset/assetname.php";
 
-                assetList.add(assetName);
-            }
+        StringRequest sr = new StringRequest(Request.Method.GET, spinnerUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            JSONArray stages = json.getJSONArray("assets");
+                            JSONObject temp = null;
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                            for (int i = 0; i < stages.length(); i++) {
+                                String assetName = (String) stages.get(i);
 
+                                assetList.add(assetName);
+                            }
 
+                            spinnerAsset.setOnItemSelectedListener(ConnectAsset.this);
+                            ArrayAdapter<String> dataAdapter =
+                                    new ArrayAdapter<String>(ConnectAsset.this, android.R.layout.simple_spinner_dropdown_item, assetList);
 
-        runOnUiThread(new Runnable() {
+                            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinnerAsset.setAdapter(dataAdapter);
+
+                        } catch (JSONException e) {
+                            // fill code for error handling part
+                        }
+                        hidepDialog();
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void run() {
-                spinnerAsset.setOnItemSelectedListener(ConnectAsset.this);
-                ArrayAdapter<String> dataAdapter =
-                        new ArrayAdapter<String>(ConnectAsset.this, android.R.layout.simple_spinner_dropdown_item, assetList);
-
-                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerAsset.setAdapter(dataAdapter);
-
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ConnectAsset.this, "Some network Issue. Please try again", Toast.LENGTH_SHORT).show();
+                hidepDialog();
             }
         });
 
-    }
+        AppController.getInstance().addToRequestQueue(sr);
 
-
-
-
-
-    public static String GET(String url){
-        InputStream inputStream = null;
-        String result = "";
-        try {
-
-            // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-
-            // make GET request to the given URL
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-
-            // receive response as inputStream
-            inputStream = httpResponse.getEntity().getContent();
-
-            // convert inputstream to string
-            if(inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Did not work!";
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
-        }
-
-        return result;
-    }
-
-
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-
-    }
-
-    private void makePost() {
-
-        HttpClient httpClient = new DefaultHttpClient();
-        // replace with your url
-        HttpPost httpPost = new HttpPost("http://www.drones.cse.buffalo.edu/ciminelli/connectasset/connect.php");
-
-        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
-        nameValuePair.add(new BasicNameValuePair("qr_code", SessionDetails.assetCode));
-        nameValuePair.add(new BasicNameValuePair("unit_no", spinnerUnit.getSelectedItem().toString()));
-
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-        } catch (UnsupportedEncodingException e) {
-            // log exception
-            e.printStackTrace();
-        }
-
-        //making POST request.
-        try {
-            HttpResponse response = httpClient.execute(httpPost);
-            // write response to log
-            Log.d("Http Post Response:", response.toString());
-        } catch (ClientProtocolException e) {
-            // Log exception
-            e.printStackTrace();
-        } catch (IOException e) {
-            // Log exception
-            e.printStackTrace();
-        }
 
 
     }
 
 
+    /*
+     *  Connect asset button that connects a QR code to a particular asset
+     */
     public void connectAsset(View view) {
-        Thread t3 = new Thread(new Runnable() {
+
+        StringRequest sr = new StringRequest(Request.Method.POST, "http://www.drones.cse.buffalo.edu/ciminelli/connectasset/connect.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {   /* Successfull response listener */
+
+                        SessionDetails.unitNo = spinnerUnit.getSelectedItem().toString();
+
+                        Intent intent = new Intent(ConnectAsset.this, AssetInformation.class);
+
+                        startActivity(intent);
+
+                        hidepDialog();
+
+                    }
+                }, new Response.ErrorListener() {   /* Error Listener (Bad network connection, etc) */
             @Override
-            public void run() {
-                makePost();
+            public void onErrorResponse(VolleyError error) {
+                hidepDialog();
+                Toast.makeText(ConnectAsset.this, "Some Problem with network....", Toast.LENGTH_LONG).show();
 
-                SessionDetails.unitNo = spinnerUnit.getSelectedItem().toString();
-
-                Intent intent = new Intent(ConnectAsset.this, AssetInformation.class);
-
-                startActivity(intent);
-
-                finish();
             }
-        });
+        }) {
+            /* POST parameters added to this http request */
+            @Override
+            protected Map<String, String> getParams() {
 
-        t3.start();
+                Map<String, String> params = new HashMap<String, String>();
+
+                /* Pass in the POST parameters */
+                params.put("qr_code", SessionDetails.assetCode);
+                params.put("unit_no", spinnerUnit.getSelectedItem().toString());
+
+                return params;
+
+            }
+        };
+
+        /* Add this request to the volley queue */
+        AppController.getInstance().addToRequestQueue(sr);
+    }
+
+    /*
+     * Method that will render the progress Dialog in the UI
+     */
+    private void showpDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    /*
+     * Method to hide the progress Dialog from the UI
+     */
+    private void hidepDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
     }
 }

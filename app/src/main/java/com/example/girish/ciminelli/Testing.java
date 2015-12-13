@@ -20,7 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -39,118 +45,91 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class Testing extends AppCompatActivity implements OnClickListener, AdapterView.OnItemClickListener {
-ListView listView;
 
 
+    ListView listView;
     String[] item;
     ArrayList<String> list;
     Dialog loadingDialog;
     String projectmname ="";
     ArrayAdapter<String> adapter;
 
-
-
-   // private ArrayList<HashMap<String, String>> list;
+    private ProgressDialog pDialog;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        LinearLayout layout_main=(LinearLayout) findViewById(R.id.action_bar_all);
+
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_actionbar);
-
-
-
 
         setContentView(R.layout.activity_testing);
 
         listView=(ListView) findViewById(R.id.listView);
 
-
-
-
-
         list=new ArrayList<>(Arrays.asList(projectmname));
         adapter=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,list);
+
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
 
+        /* Progress Dialog config */
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Please wait...");
+        pDialog.setCancelable(false);
 
 
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                renderView();
-            }
-        });
+        /* render the adapter view with list of projects through volley */
+        findProjects();
 
-        t.start();
     }
 
-    private void renderView() {
-      //  text.setText("hio");
+    /*
+     * Display list of projects to the user
+     */
+    private void findProjects() {
+        showpDialog();
 
-        //
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                loadingDialog = ProgressDialog.show(Testing.this, "Please wait", "Loading...");
-            }
+        StringRequest sr = new StringRequest(Request.Method.GET,
+                "http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_project_details.php",
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            try {
+                                JSONObject json = new JSONObject(response);
+                                JSONArray projectname = json.getJSONArray("projectName");
+                                JSONObject temp = null;
+
+
+                                for (int i=0;i<projectname.length();i++)
+                                {
+                                    temp=projectname.getJSONObject(i);
+                                    String project = temp.getString("projectName");
+                                    list.add(project);
+
+                                    adapter.notifyDataSetChanged();
+                                }
+
+                            } catch (JSONException e) {
+                                Toast.makeText(Testing.this, "Some error with parsing.. Hit refresh and try again",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            hidepDialog();
+
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(Testing.this, "Some error with network.. Hit refresh and try again",
+                                    Toast.LENGTH_SHORT).show();
+                            hidepDialog();
+                        }
         });
-        //list = new ArrayList<HashMap<String, String>>();
-        final String projectDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_project_details.php");
 
-
-
-
-
-
-        try{
-            JSONObject json = new JSONObject(projectDetails);
-            JSONArray projectname = json.getJSONArray("projectName");
-            JSONObject temp = null;
-            //projectmname = temp.getString("projectName");
-
-              //item=projectmname[0];
-                //    text.setText(projectmname);
-
-            for (int i=0;i<projectname.length();i++)
-            {
-                temp=projectname.getJSONObject(i);
-                String project = (String) temp.getString("projectName");
-                list.add(project);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-                //list.add(unitNo);
-
-               // SessionDetails.project_name=unitNo;
-            }
-
-
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-
-                    loadingDialog.dismiss();
-
-                }
-            });
-
-
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        AppController.getInstance().addToRequestQueue(sr);
     }
 
 
@@ -213,54 +192,11 @@ ListView listView;
     }
 
 
-    /* method performs a GET request to the given url */
-    public static String GET(String url){
-        InputStream inputStream = null;
-        String result = "";
-        try {
-
-            // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-
-            // make GET request to the given URL
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-
-            // receive response as inputStream
-            inputStream = httpResponse.getEntity().getContent();
-
-            // convert inputstream to string
-            if(inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Did not work!";
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
-        }
-
-        return result;
-    }
-
-
-    /* method called by the GET method to read the response from web server */
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-
-    }
-
-
-
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         SessionDetails.project_names= ((TextView)view).getText().toString();
+
+        Log.d("Project Name: ", SessionDetails.project_names);
 
         Intent intent=new Intent(this,SecondScreen.class);
         startActivity(intent);
@@ -270,4 +206,22 @@ ListView listView;
     public void onClick(View v) {
 
     }
+
+
+    /*
+     * Method that will render the progress Dialog in the UI
+     */
+    private void showpDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    /*
+     * Method to hide the progress Dialog from the UI
+     */
+    private void hidepDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
+    }
+
 }

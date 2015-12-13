@@ -16,6 +16,12 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -50,7 +56,9 @@ public class AssetInformation extends ActionBarActivity {
 
     ListView listView;
     String com;
-    TextView qrCode, unitNumber, location, service, assetName;
+    TextView unitNumber, location, assetName;
+
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,16 +74,21 @@ public class AssetInformation extends ActionBarActivity {
         /* SecondScreen is the parent of AssetInformation class */
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        /* Progress Dialog config */
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Please wait...");
+        pDialog.setCancelable(false);
+
         /*Initializing all the text boxes*/
-       // qrCode = (TextView) findViewById(R.id.qr_code);
+
         unitNumber = (TextView) findViewById(R.id.unit_no);
         location = (TextView) findViewById(R.id.location);
-       // service = (TextView) findViewById(R.id.service);
+
         assetName = (TextView) findViewById(R.id.asset_name);
         listView = (ListView) findViewById(R.id.listView1);
 
 
-
+        /*
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -84,7 +97,11 @@ public class AssetInformation extends ActionBarActivity {
         });
 
         t.start();
-
+    */
+        /*
+         * Method to populate the UI using volley
+         */
+        populateUI();
 
 
     }
@@ -148,153 +165,130 @@ public class AssetInformation extends ActionBarActivity {
     }
 
 
+    /*
+     * Method to populate the Asset Information using volley for fast networking
+     */
+    private void populateUI() {
 
-    /* method does the GET requests to the server and populated the hashmap for the list view adapter*/
-    private void renderView() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                loadingDialog = ProgressDialog.show(AssetInformation.this, "Please wait", "Loading...");
-            }
-        });
+        showpDialog();
 
-        final String stageDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_stage_details.php?unit_no="+SessionDetails.unitNo+"&"+"project_name="+SessionDetails.project_names);
-        final String assetDetails = GET("http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_asset_details.php?unit_no="+SessionDetails.unitNo+"&"+"project_name="+SessionDetails.project_names);
+        String url_asset = "http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_asset_details.php?unit_no="
+                + SessionDetails.unitNo + "&" + "project_name=" + SessionDetails.project_names;
 
-        Log.d("stages", stageDetails);
-        Log.d("assets", assetDetails);
+        String url_stage = "http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_stage_details.php?unit_no="
+                + SessionDetails.unitNo + "&" + "project_name=" + SessionDetails.project_names;
 
         list = new ArrayList<HashMap<String, String>>();
 
-        // ----------------
+        /* request one - populate asset information */
+        StringRequest request1 = new StringRequest(Request.Method.GET, url_asset,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            JSONArray assets = json.getJSONArray("assets");
+                            JSONObject temp = assets.getJSONObject(0);
 
-        final String unit_no;
-        final String asset_name;
-        final String location_asset;
-        final String service_asset;
+                            unitNumber.setText(temp.getString("unit_no"));
+                            assetName.setText(temp.getString("asset_name"));
+                            location.setText(temp.getString("location"));
 
-        try{
+                        } catch (JSONException e) {
+                            // fill error handling code later
+                        }
 
-            JSONObject json = new JSONObject(stageDetails);
-            JSONArray stages = json.getJSONArray("stages");
-            JSONObject temp = null;
-
-
-
-            for (int i=0; i < stages.length(); i++) {
-
-                temp = stages.getJSONObject(i);
-                HashMap<String, String> tempMap = new HashMap<String, String>();
-                tempMap.put(FIRST_COLUMN, temp.getString("unit_no"));
-                tempMap.put(SECOND_COLUMN, temp.getString("stage_number"));
-                tempMap.put(THIRD_COLUMN, temp.getString("stage_name"));
-                com= temp.getString("stage_comments");
-                if (com.length()<30)
-                {
-
-                    tempMap.put(FOURTH_COLUMN, temp.getString("stage_comments"));
-                    tempMap.put(SIXTH_COLUMN,temp.getString("stage_comments"));
-
-                }
-                else
-                {   com=com.substring(0,30)+"...";
-                    tempMap.put(FOURTH_COLUMN, com);
-                    tempMap.put(SIXTH_COLUMN,temp.getString("stage_comments"));
-
-                }
-
-                tempMap.put(FIFTH_COLUMN, temp.getString("completed"));
-                list.add(tempMap);
-
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // fill error handling code later
             }
+        });
 
-            json = new JSONObject(assetDetails);
-            JSONArray assets = json.getJSONArray("assets");
-            temp = assets.getJSONObject(0);
-
-            unit_no = temp.getString("unit_no");
-            asset_name = temp.getString("asset_name");
-            location_asset = temp.getString("location");
-           // service_asset = temp.getString("manufacturer");
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    unitNumber.setText( unit_no);
-                    //qrCode.setText("Asset QR Code No: " + SessionDetails.assetCode);
-                    assetName.setText( asset_name);
-                    location.setText( location_asset);
-                    //service.setText("Manufacturer: " + service_asset);
-
-                    ListViewAdapter adapter = new ListViewAdapter(AssetInformation.this, AssetInformation.this.list);
-                    adapter.notifyDataSetChanged();
-
-                    listView.setAdapter(adapter);
-                    loadingDialog.dismiss();
-
-                }
-            });
-
-        } catch (JSONException e) {
-
-            e.printStackTrace();
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    loadingDialog.dismiss();
-                }
-            });
-        }
-
-        // --------------------
+        /* request two - populate stage information */
+        StringRequest request2 = new StringRequest(Request.Method.GET, url_stage,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            JSONArray stages = json.getJSONArray("stages");
+                            JSONObject temp = null;
 
 
+                            for (int i=0; i < stages.length(); i++) {
 
+                                temp = stages.getJSONObject(i);
+                                HashMap<String, String> tempMap = new HashMap<String, String>();
+                                tempMap.put(FIRST_COLUMN, temp.getString("unit_no"));
+                                tempMap.put(SECOND_COLUMN, temp.getString("stage_number"));
+                                tempMap.put(THIRD_COLUMN, temp.getString("stage_name"));
+                                com= temp.getString("stage_comments");
+                                if (com.length()<30)
+                                {
+
+                                    tempMap.put(FOURTH_COLUMN, temp.getString("stage_comments"));
+                                    tempMap.put(SIXTH_COLUMN,temp.getString("stage_comments"));
+
+                                }
+                                else
+                                {   com=com.substring(0,30)+"...";
+                                    tempMap.put(FOURTH_COLUMN, com);
+                                    tempMap.put(SIXTH_COLUMN,temp.getString("stage_comments"));
+
+                                }
+
+                                tempMap.put(FIFTH_COLUMN, temp.getString("completed"));
+                                list.add(tempMap);
+                            }   // end of for loop
+
+                            ListViewAdapter adapter = new ListViewAdapter(AssetInformation.this, AssetInformation.this.list);
+                            adapter.notifyDataSetChanged();
+
+                            listView.setAdapter(adapter);
+
+                            hidepDialog();
+
+                        } catch (JSONException e) {
+                            // do nothing for now
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // fill error handling code later
+                hidepDialog();
+            }
+        });
+
+
+
+
+        /* queue the requests into the volley queue */
+        AppController.getInstance().addToRequestQueue(request1);
+        AppController.getInstance().addToRequestQueue(request2);
 
     }
 
-    /* method performs a GET request to the given url */
-    public static String GET(String url){
-        InputStream inputStream = null;
-        String result = "";
-        try {
 
-            // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
 
-            // make GET request to the given URL
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
 
-            // receive response as inputStream
-            inputStream = httpResponse.getEntity().getContent();
 
-            // convert inputstream to string
-            if(inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Did not work!";
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
-        }
-
-        return result;
+    /*
+     * Method that will render the progress Dialog in the UI
+     */
+    private void showpDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
     }
 
-
-    /* method called by the GET method to read the response from web server */
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-
+    /*
+     * Method to hide the progress Dialog from the UI
+     */
+    private void hidepDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
     }
 
 }

@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -21,15 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * Created by girish on 9/14/15.
@@ -41,6 +36,8 @@ public class SecondScreen extends ActionBarActivity{
     EditText assetCode;
 
     private Dialog loadingDialog;
+
+    private ProgressDialog pDialog;
 
 
 
@@ -57,6 +54,11 @@ public class SecondScreen extends ActionBarActivity{
         action.setText(SessionDetails.project_names);
 
         assetCode = (EditText) findViewById(R.id.asset_code);
+
+        /* Progress Dialog config */
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Please wait...");
+        pDialog.setCancelable(false);
 
         /* MainActivity is the parent of SecondScreen class */
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -119,97 +121,44 @@ public class SecondScreen extends ActionBarActivity{
         alertDialog.show();
     }
 
-    /* onClick handler for Getting Asset Information */
-    public void findAsset(View view) {
+    /*
+     * Method that gets Asset Information by the unit number
+     */
+    public void getInfoUnitNumber(View view) {
 
-        SessionDetails.unitNo = assetCode.getText().toString();
+        showpDialog();
 
-        if (SessionDetails.unitNo.equals("")) {
+        final String unit_number = assetCode.getText().toString();
+
+        if (unit_number.equals("")) {
             Toast.makeText(this, "Invalid QR code. Please try again", Toast.LENGTH_SHORT).show();
+            hidepDialog();
             return;
-        }
-        else
-        {
-            //Toast.makeText(this,SessionDetails.unitNo, Toast.LENGTH_SHORT).show();
-            //Toast.makeText(this,SessionDetails.project_names, Toast.LENGTH_SHORT).show();
-        }
-
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                  @Override
-                  public void run() {
-                      loadingDialog = ProgressDialog.show(SecondScreen.this, "Please wait", "Loading...");
-                  }
-                });
-
-                final String details = GET("http://www.drones.cse.buffalo.edu/ciminelli/qrcode/validateid.php?unit_no="+SessionDetails.unitNo);
-
-                if (details.equals("success")) {
-                    Intent intent = new Intent(SecondScreen.this, AssetInformation.class);
-                    startActivity(intent);
-
+        } else {
+            String url = "http://www.drones.cse.buffalo.edu/ciminelli/qrcode/validateid.php?unit_no=" + unit_number;
+            StringRequest sr = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d("Response:", response.trim().substring(0,3));
+                            if (response.trim().equals("success")) {
+                                Intent intent = new Intent(SecondScreen.this, AssetInformation.class);
+                                SessionDetails.unitNo = unit_number;
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(SecondScreen.this, "Invalid Unit No. Please try again..", Toast.LENGTH_SHORT).show();
+                            }
+                            hidepDialog();
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(SecondScreen.this, "Some network Issue. Please try again", Toast.LENGTH_SHORT).show();
+                    hidepDialog();
                 }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadingDialog.dismiss();
-                    }
-                });
-
-            }
-        });
-
-        t.start();
-
-        /* Intent intent = new Intent(this, AssetInformation.class);
-
-        startActivity(intent); */
-
-    }
-
-    /* method performs a GET request to the given url */
-    public static String GET(String url){
-        InputStream inputStream = null;
-        String result = "";
-        try {
-
-            // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-
-            // make GET request to the given URL
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-
-            // receive response as inputStream
-            inputStream = httpResponse.getEntity().getContent();
-
-            // convert inputstream to string
-            if(inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Did not work!";
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            });
+            AppController.getInstance().addToRequestQueue(sr);
         }
-
-        return result;
-    }
-
-
-    /* method called by the GET method to read the response from web server */
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-
     }
 
 
@@ -248,47 +197,64 @@ public class SecondScreen extends ActionBarActivity{
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                String contents = intent.getStringExtra("SCAN_RESULT");
-                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+                showpDialog();
 
+                final String contents = intent.getStringExtra("SCAN_RESULT");
 
-                SessionDetails.assetCode = contents;
-
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
+                String url = "http://www.drones.cse.buffalo.edu/ciminelli/qrcode/validateqr.php?qr_code=" +  contents;
+                StringRequest sr = new StringRequest(Request.Method.GET, url,
+                        new Response.Listener<String>() {
                             @Override
-                            public void run() {
-                                loadingDialog = ProgressDialog.show(SecondScreen.this, "Please wait", "Loading...");
-                            }
-                        });
+                            public void onResponse(String response) {
 
-                        final String details = GET("http://www.drones.cse.buffalo.edu/ciminelli/qrcode/validateqr.php?qr_code=" +  SessionDetails.assetCode);
+                                if (!response.trim().equals("failure")) {
 
-                        if (details.equals("success")) {
-                            Intent intent = new Intent(SecondScreen.this, AssetInformation.class);
-                            startActivity(intent);
+                                    SessionDetails.unitNo = response.trim();
+                                    SessionDetails.assetCode = contents;
 
-                        } else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    loadingDialog.dismiss();
+                                    Intent intent = new Intent(SecondScreen.this, AssetInformation.class);
+                                    startActivity(intent);
+
+                                } else {    // in case of failure
+
+                                    SessionDetails.assetCode = contents;
                                     Intent intent = new Intent(SecondScreen.this, ConnectAsset.class);
                                     startActivity(intent);
-                                }
-                            });
-                        }
 
+                                }
+
+                                hidepDialog();
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(SecondScreen.this, "Some network Issue. Please try again", Toast.LENGTH_SHORT).show();
+                        hidepDialog();
                     }
                 });
-
-                t.start();
+                AppController.getInstance().addToRequestQueue(sr);
 
 
             }
         }
 
     }
+
+    /*
+     * Method that will render the progress Dialog in the UI
+     */
+    private void showpDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    /*
+     * Method to hide the progress Dialog from the UI
+     */
+    private void hidepDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
+    }
+
+
 }
