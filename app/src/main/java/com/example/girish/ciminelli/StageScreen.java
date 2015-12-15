@@ -1,5 +1,6 @@
 package com.example.girish.ciminelli;
 
+import android.app.ProgressDialog;
 import android.content.pm.PackageInstaller;
 import android.support.v7.app.ActionBar;
 import android.app.AlertDialog;
@@ -18,6 +19,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -26,11 +32,16 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by girish on 9/28/15.
@@ -41,6 +52,8 @@ public class StageScreen extends ActionBarActivity{
     EditText viewComment;
 
     Button stageButton;
+
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +86,11 @@ public class StageScreen extends ActionBarActivity{
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        /* Progress Dialog initialization and config */
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Please wait...");
+        pDialog.setCancelable(false);
 
     }
 
@@ -133,36 +151,6 @@ public class StageScreen extends ActionBarActivity{
     }
 
 
-    /* make a post request with parameters as (URL, NameValuePair) */
-    private void makePostRequest(String url, List<NameValuePair> nameValuePair) {
-        HttpClient httpClient = new DefaultHttpClient();
-        // replace with your url
-        HttpPost httpPost = new HttpPost("http://www.drones.cse.buffalo.edu/ciminelli/stagescreen/" + url);
-
-
-        //Encoding POST data
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-        } catch (UnsupportedEncodingException e) {
-            // log exception
-            e.printStackTrace();
-        }
-
-        //making POST request.
-        try {
-            HttpResponse response = httpClient.execute(httpPost);
-            // write response to log
-            Log.d("Http Post Response:", response.toString());
-        } catch (ClientProtocolException e) {
-            // Log exception
-            e.printStackTrace();
-        } catch (IOException e) {
-            // Log exception
-            e.printStackTrace();
-        }
-    }
-
-
     /* Method that runs when the save comment button is selected */
     public void saveComment(View view) {
 
@@ -176,22 +164,47 @@ public class StageScreen extends ActionBarActivity{
             return;
         } */
 
-        Thread t = new Thread(new Runnable() {
+        showpDialog();
+
+        StringRequest sr = new StringRequest(Request.Method.POST,
+                "http://www.drones.cse.buffalo.edu/ciminelli/stagescreen/update_stage_comment.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {   /* Successfull response listener */
+                        hidepDialog();
+
+                        Intent newIntent = new Intent(StageScreen.this, AssetInformation.class);
+                        startActivity(newIntent);
+                        finish();
+
+                    }
+                }, new Response.ErrorListener() {   /* Error Listener (Bad network connection, etc) */
             @Override
-            public void run() {
-                List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(3);
-                nameValuePair.add(new BasicNameValuePair("unit_no", SessionDetails.unitNo));
-                nameValuePair.add(new BasicNameValuePair("stage_number", stageNumber));
-                nameValuePair.add(new BasicNameValuePair("stage_comments", comments));
-                makePostRequest("update_stage_comment.php", nameValuePair);
+            public void onErrorResponse(VolleyError error) {
+                hidepDialog();
+                Toast.makeText(StageScreen.this, "Some Problem with network....", Toast.LENGTH_LONG).show();
 
-                Intent newIntent = new Intent(StageScreen.this, AssetInformation.class);
-                startActivity(newIntent);
-                finish();
+                Log.d("Volley:", error.toString());
             }
-        });
+        }) {
+            /* POST parameters added to this http request */
+            @Override
+            protected Map<String, String> getParams() {
 
-        t.start();
+                Map<String, String> params = new HashMap<String, String>();
+
+                /* Pass in the POST parameters */
+                params.put("unit_no", SessionDetails.unitNo);
+                params.put("stage_number", stageNumber);
+                params.put("stage_comments", comments);
+
+                return params;
+
+            }
+        };
+
+        AppController.getInstance().addToRequestQueue(sr);
+
 
     }
 
@@ -200,29 +213,71 @@ public class StageScreen extends ActionBarActivity{
 
         final String stageNumber = getIntent().getExtras().getString("stage_number");
 
+        showpDialog();
 
-        Thread t = new Thread(new Runnable() {
+        StringRequest sr = new StringRequest(Request.Method.POST,
+                "http://www.drones.cse.buffalo.edu/ciminelli/stagescreen/update_stage.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {   /* Successfull response listener */
+                        hidepDialog();
+
+                        Intent newIntent = new Intent(StageScreen.this, AssetInformation.class);
+                        startActivity(newIntent);
+                        finish();
+
+                    }
+                }, new Response.ErrorListener() {   /* Error Listener (Bad network connection, etc) */
             @Override
-            public void run() {
-                List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(3);
-                nameValuePair.add(new BasicNameValuePair("unit_no", SessionDetails.unitNo));
-                nameValuePair.add(new BasicNameValuePair("stage_number", stageNumber));
+            public void onErrorResponse(VolleyError error) {
+                hidepDialog();
+                Toast.makeText(StageScreen.this, "Some Problem with network....", Toast.LENGTH_LONG).show();
+
+                Log.d("Volley:", error.toString());
+            }
+        }) {
+            /* POST parameters added to this http request */
+            @Override
+            protected Map<String, String> getParams() {
+
+                Map<String, String> params = new HashMap<String, String>();
+
+                /* Pass in the POST parameters */
+                params.put("unit_no", SessionDetails.unitNo);
+                params.put("stage_number", stageNumber);
 
                 if (SessionDetails.verified) {
-                    nameValuePair.add(new BasicNameValuePair("completed", "2"));
+                    params.put("completed", "2");
                 } else {
-                    nameValuePair.add(new BasicNameValuePair("completed", "1"));
+                    params.put("completed", "1");
                 }
-                
-                makePostRequest("update_stage.php", nameValuePair);
 
-                Intent newIntent = new Intent(StageScreen.this, AssetInformation.class);
-                startActivity(newIntent);
-                finish();
+                return params;
+
             }
-        });
+        };
 
-        t.start();
+        AppController.getInstance().addToRequestQueue(sr);
 
+
+
+
+
+    }
+
+    /*
+    * Method that will render the progress Dialog in the UI
+    */
+    private void showpDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    /*
+     * Method to hide the progress Dialog from the UI
+     */
+    private void hidepDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
     }
 }

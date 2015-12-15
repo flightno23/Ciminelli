@@ -54,6 +54,8 @@ public class MainActivity extends ActionBarActivity {
 
         loginButton = (Button) findViewById(R.id.button);
 
+
+        /* Progress Dialog initialization and config */
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Please wait...");
         pDialog.setCancelable(false);
