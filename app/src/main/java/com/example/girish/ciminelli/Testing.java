@@ -49,7 +49,7 @@ public class Testing extends AppCompatActivity implements OnClickListener, Adapt
 
     ListView listView;
     String[] item;
-    ArrayList<String> list;
+    ArrayList<String> list = new ArrayList<String>();
     Dialog loadingDialog;
     String projectmname ="";
     ArrayAdapter<String> adapter;
@@ -69,7 +69,6 @@ public class Testing extends AppCompatActivity implements OnClickListener, Adapt
 
         listView=(ListView) findViewById(R.id.listView);
 
-        list=new ArrayList<>(Arrays.asList(projectmname));
         adapter=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,list);
 
         listView.setAdapter(adapter);
@@ -92,6 +91,8 @@ public class Testing extends AppCompatActivity implements OnClickListener, Adapt
     private void findProjects() {
         showpDialog();
 
+        adapter.clear();
+
         StringRequest sr = new StringRequest(Request.Method.GET,
                 "http://www.drones.cse.buffalo.edu/ciminelli/assetscreen/get_project_details.php",
                     new Response.Listener<String>() {
@@ -108,7 +109,7 @@ public class Testing extends AppCompatActivity implements OnClickListener, Adapt
                                 {
                                     temp=projectname.getJSONObject(i);
                                     String project = temp.getString("projectName");
-                                    list.add(project);
+                                    adapter.add(project);
 
                                     adapter.notifyDataSetChanged();
                                 }
@@ -152,6 +153,9 @@ public class Testing extends AppCompatActivity implements OnClickListener, Adapt
         switch(id) {
             case R.id.action_logout:
                 logout();   // log out method is called when user chooses to log out
+                break;
+            case R.id.action_refresh:
+                findProjects();
                 break;
         }
 

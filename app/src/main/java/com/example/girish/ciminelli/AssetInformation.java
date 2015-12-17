@@ -8,33 +8,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -49,8 +38,6 @@ import static com.example.girish.ciminelli.SessionDetails.FIFTH_COLUMN;
  * Created by girish on 9/28/15.
  */
 public class AssetInformation extends ActionBarActivity {
-
-    private Dialog loadingDialog;
 
     private ArrayList<HashMap<String, String>> list;
 
@@ -89,16 +76,6 @@ public class AssetInformation extends ActionBarActivity {
 
 
         /*
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                renderView();
-            }
-        });
-
-        t.start();
-    */
-        /*
          * Method to populate the UI using volley
          */
         populateUI();
@@ -125,6 +102,9 @@ public class AssetInformation extends ActionBarActivity {
         switch(id) {
             case R.id.action_logout:
                 logout();   // log out method is called when user chooses to log out
+                break;
+            case R.id.action_refresh:
+                populateUI();
                 break;
         }
 
